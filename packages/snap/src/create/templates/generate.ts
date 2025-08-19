@@ -28,7 +28,9 @@ export const generateTemplateSteps = (templateFolder: string): Generator => {
         const sanitizedFileName = fileName.replace('.txt', '')
         const isWorkbenchConfig = fileName.match('motia-workbench.json')
         const generateFilePath = path.join(
-          ...(isWorkbenchConfig ? [rootDir, sanitizedFileName] : [rootDir, templateFolder, sanitizedFileName]),
+          ...(isWorkbenchConfig
+            ? [rootDir.match(/steps/) ? path.join(rootDir, '..') : rootDir, sanitizedFileName]
+            : [rootDir, templateFolder, sanitizedFileName]),
         )
         let content = await fs.readFile(filePath, 'utf8')
 

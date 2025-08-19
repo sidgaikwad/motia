@@ -19,6 +19,7 @@
     var(--tw-shadow);
   display: flex !important;
   flex-flow: column;
+  border: 1px solid var(--light-800);
 }
 
 .driver-popover-intro-step {
@@ -47,6 +48,30 @@
   ul {
     list-style-type: disc;
     margin-left: calc(var(--spacing) * 2);
+
+    &.no-decoration {
+      list-style-type: none;
+    }
+    &.square-decoration {
+      list-style-type: square;
+      padding-left: 4px;
+    }
+    &.double-indented {
+      margin-left: calc(var(--spacing) * 4);
+    }
+  }
+
+  a {
+    color: var(--color-accent-1000);
+  }
+}
+
+pre.code-preview {
+  background: var(--color-accent-200);
+
+  code.language-bash {
+    color: var(--color-accent-1000);
+    font-weight: bold;
   }
 }
 

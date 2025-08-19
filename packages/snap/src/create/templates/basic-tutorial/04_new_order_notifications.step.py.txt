@@ -1,3 +1,8 @@
+from pydantic import BaseModel, Field
+
+class NewOrderNotificationInput(BaseModel):
+    order_id: str = Field(description="pet store order id")
+
 config = {
     "type": "event",
     "name": "NewOrderNotifications",
@@ -5,7 +10,7 @@ config = {
     "subscribes": ["new-order-notification"],
     "emits": [],
     "flows": ["basic-tutorial"],
-    "input": None,  # Replace with Pydantic model for validation
+    "input": NewOrderNotificationInput.model_json_schema(),
 }
 
 async def handler(input, ctx):

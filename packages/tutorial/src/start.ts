@@ -13,27 +13,63 @@ const getSteps = (tutorialId: string) => {
   return tutorials.basic.steps
 }
 
-const waitForElement = (xpath: string, onElementFound: () => void, onTimeoutExpired: () => void) => {
-  // add logic to wait for an element to be present, with a max timeout of 60 seconds
-  let timeout = 5000
-  // change the interval for a while loop
-  while (timeout > 0) {
-    const element = xpath.match(/\/\//)
-      ? document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)?.singleNodeValue
-      : document.querySelector(xpath)
+const clickElement = (
+  selector: string,
+  useKeyDown?: boolean,
+  onElementFound?: () => void,
+  onElementNotFound?: () => void,
+) => {
+  const element = document.evaluate(selector, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
 
-    if (element) {
-      onElementFound()
+  if (element.singleNodeValue) {
+    if (useKeyDown) {
+      ;(element.singleNodeValue as HTMLElement).dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', keyCode: 13 }),
+      )
+    } else {
+      ;(element.singleNodeValue as HTMLElement).click()
+    }
+
+    onElementFound?.()
+  } else {
+    onElementNotFound?.()
+  }
+}
+
+const waitForElement = (xpath: string, onElementFound: () => void, onTimeoutExpired: () => void) => {
+  let timeout = 3000
+  const isXPath = xpath.match(/\/\//)
+
+  const checkElement = () => {
+    while (timeout > 0) {
+      console.debug('[motia-tutorial] evaluating path', xpath)
+
+      const element = isXPath
+        ? document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)?.singleNodeValue
+        : document.querySelector(xpath)
+
+      console.debug('[motia-tutorial] evaluating result', element)
+
+      if (element) {
+        onElementFound()
+        return
+      }
+
+      timeout -= 300
+
+      if (timeout <= 0) {
+        console.error('[motia-tutorial] timeout waiting for element', xpath)
+        onTimeoutExpired()
+        return
+      }
+
+      // Schedule next check after 300ms delay
+      setTimeout(checkElement, 300)
       return
     }
-
-    timeout -= 300
-
-    if (timeout === 0) {
-      console.error('Timeout waiting for element', xpath)
-      onTimeoutExpired()
-    }
   }
+
+  checkElement()
 }
 
 export const startTutorial = (config?: TutorialConfig) => {
@@ -49,12 +85,12 @@ export const startTutorial = (config?: TutorialConfig) => {
 
   let tutorialDriver: Driver | undefined
 
-  console.log('Starting tutorial', { tutorialId })
+  console.debug('[motia-tutorial] start', { tutorialId })
 
   const steps = getSteps(tutorialId)
 
   if (!steps.length) {
-    console.error('No steps found for tutorial', { tutorialId })
+    console.error('[motia-tutorial] no steps found for tutorial', { tutorialId })
     return
   }
 
@@ -62,6 +98,8 @@ export const startTutorial = (config?: TutorialConfig) => {
     tutorialDriver = driver({
       showProgress: true,
       overlayOpacity: 0.5,
+      nextBtnText: '<span>Next [►]</span>',
+      prevBtnText: '<span class="text-sm">Prev [◄]</span>',
       onPopoverRender: (popover: PopoverDOM) => {
         const container = document.createElement('div')
         container.className = 'tutorial-opt-out-container'
@@ -71,6 +109,7 @@ export const startTutorial = (config?: TutorialConfig) => {
         secondButton.type = 'button'
 
         secondButton.addEventListener('click', () => {
+          config?.onSkipTutorialEvent?.()
           tutorialDriver?.destroy()
           window.localStorage.setItem('motia-tutorial-skipped', 'true')
         })
@@ -79,7 +118,7 @@ export const startTutorial = (config?: TutorialConfig) => {
         popover.wrapper.appendChild(container)
       },
       // NOTE: we map the internal step definitions into the Driver.js structure in order to avoid injecting dependencies from the UI into the step definitions
-      steps: steps.map((step: TutorialStep) => ({
+      steps: steps.map((step: TutorialStep, currentStepIndex) => ({
         element: step.elementXpath.match('//')
           ? () => {
               const result = document.evaluate(
@@ -98,65 +137,140 @@ export const startTutorial = (config?: TutorialConfig) => {
           position: step.position,
           onNextClick: () => {
             if (tutorialDriver?.isLastStep()) {
+              config?.onTutorialCompletedEvent?.()
               window.localStorage.setItem('motia-tutorial-skipped', 'true')
             }
 
-            if (step.runScriptBeforeNext) {
-              step.runScriptBeforeNext()
-            }
+            step?.runScriptBeforeNext?.()
 
             if (step.clickSelectorBeforeNext) {
+              clickElement(step.clickSelectorBeforeNext, step.useKeyDownEventOnClickBeforeNext)
+            }
+
+            if (step.waitForSelector) {
+              waitForElement(
+                step.waitForSelector,
+                () => tutorialDriver?.moveNext(),
+                () => tutorialDriver?.moveNext(),
+              )
+              return
+            }
+
+            tutorialDriver?.moveNext()
+          },
+          onPrevClick: () => {
+            if (!tutorialDriver?.hasPreviousStep()) {
+              return
+            }
+
+            const previousStep = steps[currentStepIndex - 1]
+
+            if (!previousStep) {
+              tutorialDriver?.movePrevious()
+              return
+            }
+
+            const defaultMovePreviousActivities = () => {
+              if (step.clickSelectorBeforePrev) {
+                clickElement(step.clickSelectorBeforePrev, step.useKeyDownEventOnClickBeforeNext)
+              }
+
+              console.debug('[motia-tutorial] proceeding with prev step')
+
+              previousStep?.runScriptBeforePrev?.()
+
+              if (step.waitForSelectorOnPrev) {
+                waitForElement(
+                  step.waitForSelectorOnPrev,
+                  () => tutorialDriver?.movePrevious(),
+                  () => tutorialDriver?.movePrevious(),
+                )
+                return
+              }
+
+              if (previousStep?.goBackStepCountOnPrev) {
+                tutorialDriver?.moveTo(currentStepIndex - previousStep.goBackStepCountOnPrev)
+
+                return
+              }
+
+              tutorialDriver?.movePrevious()
+            }
+
+            if (previousStep.requiredSelectorOnPrev) {
               const element = document.evaluate(
-                step.clickSelectorBeforeNext,
+                previousStep.requiredSelectorOnPrev,
                 document,
                 null,
                 XPathResult.FIRST_ORDERED_NODE_TYPE,
                 null,
               )
 
-              if (element.singleNodeValue) {
-                if (step.useKeyDownEventOnClickBeforeNext) {
-                  ;(element.singleNodeValue as HTMLElement).dispatchEvent(
-                    new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', keyCode: 13 }),
-                  )
+              console.debug('[motia-tutorial] on prev required selector result', element)
+
+              if (!element?.singleNodeValue && previousStep.clickRequireSelectorMissingOnPrev) {
+                let clickTargets = []
+
+                if (!Array.isArray(previousStep.clickRequireSelectorMissingOnPrev)) {
+                  clickTargets = [previousStep.clickRequireSelectorMissingOnPrev]
                 } else {
-                  ;(element.singleNodeValue as HTMLElement).click()
+                  clickTargets = previousStep.clickRequireSelectorMissingOnPrev
                 }
+
+                const onElementFound = () => {
+                  waitForElement(
+                    previousStep.requiredSelectorOnPrev!,
+                    () => {
+                      console.debug('[motia-tutorial] wait for success')
+                      previousStep?.runScriptOnRequiredSelectorOnPrevFound?.()
+                      waitForElement(
+                        previousStep.elementXpath,
+                        () => defaultMovePreviousActivities(),
+                        () => defaultMovePreviousActivities(),
+                      )
+                    },
+                    () => {
+                      console.debug('[motia-tutorial] wait for failed, continue')
+                      tutorialDriver?.movePrevious()
+                    },
+                  )
+                }
+
+                for (let i = 0; i < clickTargets.length; i += 1) {
+                  const isLastTarget = i === clickTargets.length - 1
+                  const currentTarget = clickTargets[i]
+
+                  const selector = typeof currentTarget === 'object' ? currentTarget.target : currentTarget
+
+                  const clickAction = () =>
+                    clickElement(
+                      selector,
+                      typeof currentTarget === 'object' ? currentTarget?.useKeyDown : false,
+                      isLastTarget ? onElementFound : undefined,
+                      isLastTarget ? () => defaultMovePreviousActivities() : undefined,
+                    )
+
+                  if (i > 0) {
+                    waitForElement(
+                      selector,
+                      () => clickAction(),
+                      () => defaultMovePreviousActivities(),
+                    )
+                  } else {
+                    clickAction()
+                  }
+                }
+
+                return
               }
-            }
 
-            if (step.waitForSelector) {
-              // add logic to wait for an element to be present, with a max timeout of 60 seconds
-              let timeout = 5000
-              let interval = setInterval(() => {
-                const element = document.evaluate(
-                  step.waitForSelector!,
-                  document,
-                  null,
-                  XPathResult.FIRST_ORDERED_NODE_TYPE,
-                  null,
-                )
-
-                if (element.singleNodeValue) {
-                  tutorialDriver?.moveNext()
-                  clearInterval(interval)
-                }
-
-                timeout -= 300
-
-                if (timeout === 0) {
-                  console.error('Timeout waiting for element', step.waitForSelector)
-                  tutorialDriver?.moveNext()
-                  clearInterval(interval)
-                }
-              }, 300)
-
+              defaultMovePreviousActivities()
               return
             }
 
-            tutorialDriver?.moveNext()
+            defaultMovePreviousActivities()
           },
-          ...(step.id === 'intro' ? { popoverClass: 'driver-popover driver-popover-intro-step' } : {}),
+          ...(['intro', 'end'].includes(step.id) ? { popoverClass: 'driver-popover driver-popover-intro-step' } : {}),
         },
       })),
       onDestroyStarted: () => {

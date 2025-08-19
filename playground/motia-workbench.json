@@ -1,14 +1,5 @@
 [
   {
-    "id": "cron-example",
-    "config": {
-      "steps/cronExample/handlePeriodicJob.step.ts": {
-        "x": 0,
-        "y": 0
-      }
-    }
-  },
-  {
     "id": "simple-python",
     "config": {
       "steps/simplePython/testedEvent.step.py": {
@@ -80,31 +71,6 @@
     }
   },
   {
-    "id": "basic-tutorial",
-    "config": {
-      "steps/basic-tutorial/04_new_order_notifications.step.py": {
-        "x": 416,
-        "y": 820
-      },
-      "steps/basic-tutorial/03-state-audit-cron.step.ts": {
-        "x": 0,
-        "y": 0
-      },
-      "steps/basic-tutorial/02-process-food-order.step.ts": {
-        "x": 387,
-        "y": 584
-      },
-      "steps/basic-tutorial/01-api.step.ts": {
-        "x": 387,
-        "y": 260
-      },
-      "steps/basic-tutorial/00-noop.step.ts": {
-        "x": 387,
-        "y": 22
-      }
-    }
-  },
-  {
     "id": "default",
     "config": {
       "steps/default-node/03-check-state-change.step.ts": {
@@ -145,6 +111,45 @@
       "steps/open_ai_python/prompt_api_step.py": {
         "x": 311,
         "y": 0
+      }
+    }
+  },
+  {
+    "id": "cron-example",
+    "config": {
+      "steps/cronExample/periodicJobHandled.step.ts": {
+        "x": 0,
+        "y": 260
+      },
+      "steps/cronExample/handlePeriodicJob.step.ts": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  {
+    "id": "basic-tutorial",
+    "config": {
+      "steps/basic-tutorial/04_new_order_notifications.step.py": {
+        "x": 668,
+        "y": 266,
+        "targetHandlePosition": "left"
+      },
+      "steps/basic-tutorial/03-state-audit-cron.step.ts": {
+        "x": 224,
+        "y": 520
+      },
+      "steps/basic-tutorial/02-process-food-order.step.ts": {
+        "x": 220,
+        "y": 242,
+        "sourceHandlePosition": "right",
+        "targetHandlePosition": "left"
+      },
+      "steps/basic-tutorial/01-api.step.ts": {
+        "x": -243,
+        "y": 199,
+        "sourceHandlePosition": "right",
+        "targetHandlePosition": "left"
       }
     }
   }

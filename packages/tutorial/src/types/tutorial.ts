@@ -6,9 +6,16 @@ export type TutorialStep = {
   elementXpath: string
   segmentId: string
   clickSelectorBeforeNext?: string
+  clickSelectorBeforePrev?: string
   waitForSelector?: string
+  waitForSelectorOnPrev?: string
   runScriptBeforeNext?: () => void
+  runScriptBeforePrev?: () => void
   useKeyDownEventOnClickBeforeNext?: boolean
+  requiredSelectorOnPrev?: string
+  clickRequireSelectorMissingOnPrev?: string | { target: string; useKeyDown?: boolean }[]
+  runScriptOnRequiredSelectorOnPrevFound?: () => void
+  goBackStepCountOnPrev?: number
 }
 
 export type Tutorial = {
@@ -23,4 +30,6 @@ export type TutorialConfig = {
   segmentId?: string
   initialStepIndex?: number
   resetSkipState?: boolean
+  onSkipTutorialEvent?: () => void
+  onTutorialCompletedEvent?: () => void
 }

@@ -15,7 +15,9 @@ export const Tooltip = ({
       <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>
         <TooltipPrimitive.Content className="TooltipContent" side="bottom">
-          <div className="p-2 bg-background text-popover-foreground text-sm rounded-lg">{content}</div>
+          <div className="p-2 bg-background text-popover-foreground text-sm rounded-lg border border-light-800">
+            {content}
+          </div>
           <TooltipPrimitive.Arrow className="TooltipArrow" />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
