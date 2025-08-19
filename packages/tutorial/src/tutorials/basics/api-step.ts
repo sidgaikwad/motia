@@ -73,7 +73,7 @@ export const apiSteps: TutorialStep[] = [
     elementXpath: `//span[contains(text(), "emits")]/..`,
     segmentId,
     title: 'Event Driven Architecture',
-    description: `Motia allows you to interact between steps or flows through an event driven architecture.<br/><br/> In order to connect your steps during runtime you will use the <b>emits</b> and <br>subscribes</br> attributes.<br/><br/> Through the <b>emits</b>, you can specify a list of topics that your step emits for others to <i>subscribe</i>.`,
+    description: `Motia allows you to interact between steps or flows through an event driven architecture.<br/><br/> In order to connect your steps during runtime you will use the <b>emits</b> and <b>subscribes</b> attributes.<br/><br/> Through the <b>emits</b>, you can specify a list of topics that your step emits for others to <i>subscribe</i>.`,
     id: uuidv4(),
   },
   {

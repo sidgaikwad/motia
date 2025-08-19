@@ -129,7 +129,7 @@ export const startTutorial = (config?: TutorialConfig) => {
             const container = document.createElement('div')
             container.className = 'tutorial-opt-out-container'
             const secondButton = document.createElement('button')
-            secondButton.innerText = 'Never show again'
+            secondButton.innerText = 'Close'
             secondButton.className = 'tutorial-opt-out-button'
             secondButton.type = 'button'
 
