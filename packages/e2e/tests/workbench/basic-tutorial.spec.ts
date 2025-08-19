@@ -57,7 +57,7 @@ test.describe('Motia Basic Tutorial - Workbench', () => {
     await expect(tutorialNextButton).toBeVisible()
 
     const tutorialPrevButton = page.locator('.driver-popover-prev-btn').first()
-    await expect(tutorialPrevButton).toBeVisible()
+    await expect(tutorialPrevButton).not.toBeVisible()
     await expect(tutorialPrevButton).toBeDisabled()
 
     await tutorialNextButton.click()
@@ -83,7 +83,7 @@ test.describe('Motia Basic Tutorial - Workbench', () => {
     await expect(tutorialNextButton).toBeVisible()
 
     const tutorialPrevButton = page.locator('.driver-popover-prev-btn').first()
-    await expect(tutorialPrevButton).toBeVisible()
+    await expect(tutorialPrevButton).not.toBeVisible()
 
     for (let i = 0; i < 3; i++) {
       await tutorialNextButton.click()

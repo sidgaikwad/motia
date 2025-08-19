@@ -97,26 +97,9 @@ export const startTutorial = (config?: TutorialConfig) => {
   const driveTutorial = () => {
     tutorialDriver = driver({
       showProgress: true,
-      overlayOpacity: 0.5,
-      nextBtnText: '<span>Next [►]</span>',
-      prevBtnText: '<span class="text-sm">Prev [◄]</span>',
-      onPopoverRender: (popover: PopoverDOM) => {
-        const container = document.createElement('div')
-        container.className = 'tutorial-opt-out-container'
-        const secondButton = document.createElement('button')
-        secondButton.innerText = 'Never show again'
-        secondButton.className = 'tutorial-opt-out-button'
-        secondButton.type = 'button'
-
-        secondButton.addEventListener('click', () => {
-          config?.onSkipTutorialEvent?.()
-          tutorialDriver?.destroy()
-          window.localStorage.setItem('motia-tutorial-skipped', 'true')
-        })
-
-        container.appendChild(secondButton)
-        popover.wrapper.appendChild(container)
-      },
+      overlayOpacity: 0.4,
+      nextBtnText: 'Next',
+      prevBtnText: '←',
       // NOTE: we map the internal step definitions into the Driver.js structure in order to avoid injecting dependencies from the UI into the step definitions
       steps: steps.map((step: TutorialStep, currentStepIndex) => ({
         element: step.elementXpath.match('//')
@@ -135,6 +118,30 @@ export const startTutorial = (config?: TutorialConfig) => {
           title: `<h3 class="popover-title">${step.title}</h3>`,
           description: `<p class="popover-description">${step.description}</p>`,
           position: step.position,
+          onPopoverRender(popover: PopoverDOM) {
+            if (step.image) {
+              const image = document.createElement('img')
+              image.src = step.image
+              image.className = 'driver-popover-image'
+              popover.wrapper.prepend(image)
+            }
+
+            const container = document.createElement('div')
+            container.className = 'tutorial-opt-out-container'
+            const secondButton = document.createElement('button')
+            secondButton.innerText = 'Never show again'
+            secondButton.className = 'tutorial-opt-out-button'
+            secondButton.type = 'button'
+
+            secondButton.addEventListener('click', () => {
+              config?.onSkipTutorialEvent?.()
+              tutorialDriver?.destroy()
+              window.localStorage.setItem('motia-tutorial-skipped', 'true')
+            })
+
+            container.appendChild(secondButton)
+            popover.wrapper.appendChild(container)
+          },
           onNextClick: () => {
             if (tutorialDriver?.isLastStep()) {
               config?.onTutorialCompletedEvent?.()

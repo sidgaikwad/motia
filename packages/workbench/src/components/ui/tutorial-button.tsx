@@ -83,14 +83,9 @@ export const TutorialButton: FC = () => {
   }
 
   const trigger = (
-    <Button
-      data-testid="tutorial-trigger"
-      variant={isTutorialFlowMissing ? 'default' : 'accent'}
-      size="sm"
-      onClick={() => onTutorialButtonClick()}
-    >
+    <Button data-testid="tutorial-trigger" variant="default" onClick={() => onTutorialButtonClick()}>
       <Book className="h-4 w-4" />
-      <span>Tutorial</span>
+      Tutorial
     </Button>
   )
 

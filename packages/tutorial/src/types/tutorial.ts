@@ -1,6 +1,7 @@
 export type TutorialStep = {
   id: string
   title: string
+  image?: string
   description?: string
   position?: 'left' | 'right' | 'top' | 'bottom'
   elementXpath: string
