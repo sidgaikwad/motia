@@ -149,21 +149,29 @@ export const startTutorial = (config?: TutorialConfig) => {
             }
 
             step?.runScriptBeforeNext?.()
-
-            if (step.clickSelectorBeforeNext) {
-              clickElement(step.clickSelectorBeforeNext, step.useKeyDownEventOnClickBeforeNext)
+            const navigateNext = () => {
+              if (step.waitForSelector) {
+                waitForElement(
+                  step.waitForSelector,
+                  () => tutorialDriver?.moveNext(),
+                  () => tutorialDriver?.moveNext(),
+                )
+                return
+              }
+              tutorialDriver?.moveNext()
             }
 
-            if (step.waitForSelector) {
-              waitForElement(
-                step.waitForSelector,
-                () => tutorialDriver?.moveNext(),
-                () => tutorialDriver?.moveNext(),
+            if (step.clickSelectorBeforeNext) {
+              clickElement(
+                step.clickSelectorBeforeNext,
+                step.useKeyDownEventOnClickBeforeNext,
+                navigateNext,
+                navigateNext,
               )
               return
             }
 
-            tutorialDriver?.moveNext()
+            navigateNext()
           },
           onPrevClick: () => {
             if (!tutorialDriver?.hasPreviousStep()) {
@@ -178,30 +186,40 @@ export const startTutorial = (config?: TutorialConfig) => {
             }
 
             const defaultMovePreviousActivities = () => {
-              if (step.clickSelectorBeforePrev) {
-                clickElement(step.clickSelectorBeforePrev, step.useKeyDownEventOnClickBeforeNext)
+              const continueOnPrev = () => {
+                console.debug('[motia-tutorial] proceeding with prev step')
+
+                previousStep?.runScriptBeforePrev?.()
+
+                if (step.waitForSelectorOnPrev) {
+                  waitForElement(
+                    step.waitForSelectorOnPrev,
+                    () => tutorialDriver?.movePrevious(),
+                    () => tutorialDriver?.movePrevious(),
+                  )
+                  return
+                }
+
+                if (previousStep?.goBackStepCountOnPrev) {
+                  tutorialDriver?.moveTo(currentStepIndex - previousStep.goBackStepCountOnPrev)
+
+                  return
+                }
+
+                tutorialDriver?.movePrevious()
               }
 
-              console.debug('[motia-tutorial] proceeding with prev step')
-
-              previousStep?.runScriptBeforePrev?.()
-
-              if (step.waitForSelectorOnPrev) {
-                waitForElement(
-                  step.waitForSelectorOnPrev,
-                  () => tutorialDriver?.movePrevious(),
-                  () => tutorialDriver?.movePrevious(),
+              if (step.clickSelectorBeforePrev) {
+                clickElement(
+                  step.clickSelectorBeforePrev,
+                  step.useKeyDownEventOnClickBeforeNext,
+                  continueOnPrev,
+                  continueOnPrev,
                 )
                 return
               }
 
-              if (previousStep?.goBackStepCountOnPrev) {
-                tutorialDriver?.moveTo(currentStepIndex - previousStep.goBackStepCountOnPrev)
-
-                return
-              }
-
-              tutorialDriver?.movePrevious()
+              continueOnPrev()
             }
 
             if (previousStep.requiredSelectorOnPrev) {
@@ -230,15 +248,11 @@ export const startTutorial = (config?: TutorialConfig) => {
                     () => {
                       console.debug('[motia-tutorial] wait for success')
                       previousStep?.runScriptOnRequiredSelectorOnPrevFound?.()
-                      waitForElement(
-                        previousStep.elementXpath,
-                        () => defaultMovePreviousActivities(),
-                        () => defaultMovePreviousActivities(),
-                      )
+                      defaultMovePreviousActivities()
                     },
                     () => {
                       console.debug('[motia-tutorial] wait for failed, continue')
-                      tutorialDriver?.movePrevious()
+                      defaultMovePreviousActivities()
                     },
                   )
                 }

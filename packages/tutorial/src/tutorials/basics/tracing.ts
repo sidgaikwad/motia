@@ -45,5 +45,16 @@ export const tracingSteps: TutorialStep[] = [
     title: 'Trace Details',
     description: `This is the <b>trace details view</b>, this will allow you to look deeper into the logs raised during the execution of a step.<br/><br/> 💡 This is a simplified version of the logs, if you wish to look further into a log you will need to use the <b>logs tool</b>.`,
     id: uuidv4(),
+    requiredSelectorOnPrev: `//div[@data-testid="trace-details"]`,
+    clickRequireSelectorMissingOnPrev: [
+      {
+        target: '//button[@data-testid="traces-link"]',
+        useKeyDown: true,
+      },
+      {
+        target: '(//div[@data-testid="trace-id"])[1]',
+      },
+    ],
+    waitForSelectorOnPrev: '//div[@id="app-sidebar-container"]',
   },
 ]
