@@ -2,10 +2,9 @@
   "title": "Getting Started",
   "defaultOpen": true,
   "pages": [
-    "installation",
-    "quick-start",
+    "quick-start", 
+    "project-structure",
     "build-your-first-app",
-    "prerequisites",
     "core-concepts"
   ]
 }

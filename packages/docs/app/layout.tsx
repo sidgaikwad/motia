@@ -7,6 +7,7 @@ import { GoogleTagManager } from '@next/third-parties/google'
 import { Analytics } from '@vercel/analytics/react'
 import { headers } from 'next/headers'
 import PlausibleProvider from 'next-plausible'
+import Script from 'next/script'
 
 const tasaExplorer = localFont({
   src: [
@@ -152,6 +153,17 @@ export async function generateMetadata(_props: never, _parent: ResolvingMetadata
   }
 }
 
+function JsonLd({ id, data }: { id: string; data: Record<string, unknown> }) {
+  return (
+    <Script
+      id={id}
+      type="application/ld+json"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  )
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -177,16 +189,17 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-touch-fullscreen" content="yes" />
 
-        <script type="application/ld+json">
-          {JSON.stringify({
+        <JsonLd
+          id="website-jsonld"
+          data={{
             '@context': 'https://schema.org',
             '@type': 'WebSite',
             name: metaTitle,
             description: metaDescription,
             url: 'https://motia.dev',
             image: ['https://motia.dev/og-image-updated-new.jpg'],
-          })}
-        </script>
+          }}
+         />
       </head>
       <body
         suppressHydrationWarning
