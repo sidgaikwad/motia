@@ -1,8 +1,8 @@
-import { CollapsiblePanel, CollapsiblePanelGroup, TabsContent, TabsList, TabsTrigger } from '@motiadev/ui'
+import { CollapsiblePanel, CollapsiblePanelGroup, Panel, TabsContent, TabsList, TabsTrigger } from '@motiadev/ui'
 import { ReactFlowProvider } from '@xyflow/react'
 import { analytics } from '@/lib/analytics'
 import { File, GanttChart, Link2, LogsIcon } from 'lucide-react'
-import { FC, useCallback, useMemo } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { EndpointsPage } from './components/endpoints/endpoints-page'
 import { FlowPage } from './components/flow/flow-page'
 import { FlowTabMenuItem } from './components/flow/flow-tab-menu-item'
@@ -22,6 +22,7 @@ export const App: FC = () => {
   const tab = useTabsStore((state) => state.tab)
   const setTopTab = useTabsStore((state) => state.setTopTab)
   const setBottomTab = useTabsStore((state) => state.setBottomTab)
+  const [viewMode, setViewMode] = useState<'project' | 'system'>('system')
 
   const tabChangeCallbacks = useMemo<Record<TabLocation, (tab: string) => void>>(
     () => ({
@@ -38,6 +39,48 @@ export const App: FC = () => {
     },
     [tabChangeCallbacks, tab],
   )
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const viewMode = url.searchParams.get('view-mode') as 'project' | 'system'
+    if (viewMode) {
+      setViewMode(viewMode)
+    }
+  }, [setViewMode])
+
+  if (viewMode === 'project') {
+    return (
+      <div className="grid grid-rows-[auto_1fr] grid-cols-[1fr_auto] bg-background text-foreground h-screen ">
+        <main className="m-2 overflow-hidden" role="main">
+          <Panel
+            tabs={[
+              {
+                label: 'Flow',
+                labelComponent: <FlowTabMenuItem />,
+                content: (
+                  <ReactFlowProvider>
+                    <div className="h-[calc(100vh-100px)] w-full">
+                      <FlowPage />
+                    </div>
+                  </ReactFlowProvider>
+                ),
+              },
+              {
+                label: 'Endpoint',
+                labelComponent: (
+                  <>
+                    <Link2 />
+                    Endpoint
+                  </>
+                ),
+                content: <EndpointsPage />,
+              },
+            ]}
+          />
+        </main>
+        <div id={APP_SIDEBAR_CONTAINER_ID} />
+      </div>
+    )
+  }
 
   return (
     <div className="grid grid-rows-[auto_1fr] grid-cols-[1fr_auto] bg-background text-foreground h-screen">
