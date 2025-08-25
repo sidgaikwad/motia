@@ -3,7 +3,7 @@ import { test, expect } from '../fixtures/motia-fixtures'
 test.describe('End-to-End Integration Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
-      localStorage.setItem('motia-tutorial-skipped', 'true')
+      localStorage.setItem('motia-tutorial-closed', 'true')
     })
   })
 

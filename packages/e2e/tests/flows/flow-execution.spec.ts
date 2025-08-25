@@ -12,7 +12,7 @@ test.describe('Flow Execution Tests', () => {
     api = new ApiHelpers(page)
 
     await page.addInitScript(() => {
-      localStorage.setItem('motia-tutorial-skipped', 'true')
+      localStorage.setItem('motia-tutorial-closed', 'true')
     })
   })
 

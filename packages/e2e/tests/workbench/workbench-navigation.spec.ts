@@ -12,7 +12,7 @@ test.describe('CLI Generated Project - Workbench Navigation', () => {
     logsPage = new LogsPage(page)
 
     await page.addInitScript(() => {
-      localStorage.setItem('motia-tutorial-skipped', 'true')
+      localStorage.setItem('motia-tutorial-closed', 'true')
     })
   })
 

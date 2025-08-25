@@ -12,6 +12,8 @@ export class WorkbenchPage extends MotiaApplicationPage {
   readonly startFlowButton: Locator
   readonly flowContainer: Locator
   readonly tutorialPopover: Locator
+  readonly tutorialPopoverTitle: Locator
+  readonly tutorialNextButton: Locator
 
   constructor(page: Page) {
     super(page)
@@ -24,7 +26,9 @@ export class WorkbenchPage extends MotiaApplicationPage {
     this.flowsLink = page.locator('.flows-dropdown .flow-link')
     this.startFlowButton = page.getByTestId('start-flow-button')
     this.flowContainer = page.getByTestId('flow-container')
-    this.tutorialPopover = page.locator('#driver-popover-content')
+    this.tutorialPopover = page.locator('.driver-popover')
+    this.tutorialPopoverTitle = page.locator('.popover-title')
+    this.tutorialNextButton = page.locator('.driver-popover-next-btn')
   }
 
   async open() {

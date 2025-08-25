@@ -175,17 +175,6 @@ generate
     })
   })
 
-generate
-  .command('tutorial-flow')
-  .description('Download the tutorial flow into an existing motia project')
-  .action(
-    handler(async (_, context) => {
-      const { createTutorialFlow } = require('./create/setup-tutorial-flow')
-      await createTutorialFlow({ context })
-      process.exit(0)
-    }),
-  )
-
 const docker = program.command('docker').description('Motia docker commands')
 
 docker
