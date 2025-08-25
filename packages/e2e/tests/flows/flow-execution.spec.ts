@@ -1,22 +1,9 @@
-import { test, expect } from '@playwright/test'
-import { WorkbenchPage, LogsPage, ApiHelpers } from '../page-objects'
+import { expect, test } from '@/src/motia-fixtures'
 
 test.describe('Flow Execution Tests', () => {
-  let workbench: WorkbenchPage
-  let logsPage: LogsPage
-  let api: ApiHelpers
+  test.beforeEach(({ helpers }) => helpers.skipTutorial())
 
-  test.beforeEach(async ({ page }) => {
-    workbench = new WorkbenchPage(page)
-    logsPage = new LogsPage(page)
-    api = new ApiHelpers(page)
-
-    await page.addInitScript(() => {
-      localStorage.setItem('motia-tutorial-closed', 'true')
-    })
-  })
-
-  test('should execute a complete flow end-to-end', async ({ page }) => {
+  test('should execute a complete flow end-to-end', async ({ workbench, logsPage }) => {
     await test.step('Navigate to workbench', async () => {
       await workbench.open()
       await workbench.verifyWorkbenchInterface()
@@ -40,7 +27,7 @@ test.describe('Flow Execution Tests', () => {
     })
   })
 
-  test('should handle flow execution with API trigger', async ({ page }) => {
+  test('should handle flow execution with API trigger', async ({ workbench, logsPage, api, page }) => {
     await test.step('Navigate to workbench', async () => {
       await workbench.open()
       await workbench.verifyWorkbenchInterface()
@@ -62,7 +49,7 @@ test.describe('Flow Execution Tests', () => {
     })
   })
 
-  test('should execute multiple flows sequentially', async ({ page }) => {
+  test('should execute multiple flows sequentially', async ({ workbench, logsPage }) => {
     const flows = ['default']
 
     for (const flowName of flows) {
@@ -75,7 +62,7 @@ test.describe('Flow Execution Tests', () => {
     }
   })
 
-  test('should verify flow state management', async ({ page }) => {
+  test('should verify flow state management', async ({ workbench, logsPage }) => {
     await test.step('Execute flow with state operations', async () => {
       await workbench.open()
       await workbench.executeFlowAndNavigateToLogs('default')
@@ -99,7 +86,7 @@ test.describe('Flow Execution Tests', () => {
     })
   })
 
-  test('should handle flow errors gracefully', async ({ page }) => {
+  test('should handle flow errors gracefully', async ({ workbench, logsPage, api }) => {
     await test.step('Trigger a flow that might error', async () => {
       // This would trigger an endpoint that intentionally errors
       const response = await api.post('/api/trigger/error-flow', {

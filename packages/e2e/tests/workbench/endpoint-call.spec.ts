@@ -1,25 +1,15 @@
-import { test, expect } from '@playwright/test'
-import { WorkbenchPage, EndpointPage } from '../page-objects' // Assuming WorkbenchPage is in this location
+import { expect, test } from '@/src/motia-fixtures'
 
 test.describe('Workbench - Endpoint Call JSON Validation', () => {
-  let workbench: WorkbenchPage
-  let endpoint: EndpointPage
-
-  test.beforeEach(async ({ page }) => {
-    workbench = new WorkbenchPage(page)
-    endpoint = new EndpointPage(page)
-
-    await page.addInitScript(() => {
-      localStorage.setItem('motia-tutorial-closed', 'true')
-    })
-
+  test.beforeEach(async ({ helpers, workbench, endpoint }) => {
+    await helpers.skipTutorial()
     await workbench.open()
     await workbench.navigateToEndpoints()
     await endpoint.firstEndpointItem.click()
     await endpoint.callTab.click()
   })
 
-  test('should validate JSON body input', async () => {
+  test('should validate JSON body input', async ({ endpoint }) => {
     await test.step('Initial state: Play button should be enabled with default/valid JSON', async () => {
       await expect(endpoint.playButton).toBeEnabled()
     })
