@@ -1,7 +1,7 @@
 {
   "name": "motia",
   "description": "A Modern Unified Backend Framework for APIs, Events and Agents",
-  "version": "0.7.0-beta.131",
+  "version": "0.7.1-beta.132",
   "license": "MIT",
   "repository": {
     "type": "git",
