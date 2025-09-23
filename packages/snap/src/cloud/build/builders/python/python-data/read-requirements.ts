@@ -1,17 +1,19 @@
 import fs from 'fs'
 
-// Example: 'sklearn': 'scikit-learn==1.0.2'
-export type Requirements = { [importName: string]: string }
-
-type PackageInfo = { name: string; importName: string }
-type PackageDescriber = (packageName: string) => PackageInfo
+/**
+ * { libraryName: lineFromRequirementsFile }
+ *
+ * Example:
+ * { scikit-learn: 'scikit-learn==1.0.2' }
+ */
+export type Requirements = Record<string, string>
 
 /**
  * Read the requirements.txt file and return a set of dependencies
  * @param filePath
  * @returns set of all dependencies names
  */
-export const readRequirements = (filePath: string, describer: PackageDescriber): Requirements => {
+export const readRequirements = (filePath: string): Requirements => {
   const content = fs.readFileSync(filePath, 'utf8')
 
   const lines = content.split('\n')
@@ -27,9 +29,10 @@ export const readRequirements = (filePath: string, describer: PackageDescriber):
 
     // Extract package name (everything before version specifiers)
     const packageMatch = trimmedLine.match(/^([a-zA-Z0-9_-]+)/)
+
     if (packageMatch) {
-      const packageInfo = describer(packageMatch[1])
-      requirements[packageInfo.importName] = trimmedLine
+      const packageName = packageMatch[1]
+      requirements[packageName] = trimmedLine
     }
   }
 
