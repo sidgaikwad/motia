@@ -1,10 +1,9 @@
-import { useThemeStore } from './stores/use-theme-store'
+import { useThemeStore } from '@motiadev/ui'
 import { Editor, useMonaco } from '@monaco-editor/react'
 import { FC, useEffect, useMemo } from 'react'
 
 type JsonEditorProps = {
   value: string
-  height?: number | string
   schema?: Record<string, unknown>
   onChange?: (value: string) => void
   onValidate?: (isValid: boolean) => void
@@ -14,7 +13,6 @@ type JsonEditorProps = {
 
 export const JsonEditor: FC<JsonEditorProps> = ({
   value,
-  height = 300,
   schema,
   onChange,
   onValidate,
@@ -23,7 +21,7 @@ export const JsonEditor: FC<JsonEditorProps> = ({
 }) => {
   const monaco = useMonaco()
   const theme = useThemeStore((state: { theme: string }) => state.theme)
-  const editorTheme = useMemo(() => (theme === 'dark' ? 'vs-dark' : 'light'), [theme])
+  const editorTheme = useMemo(() => (theme === 'dark' ? 'transparent-dark' : 'transparent-light'), [theme])
 
   useEffect(() => {
     if (!monaco) return
@@ -40,12 +38,45 @@ export const JsonEditor: FC<JsonEditorProps> = ({
           ]
         : [],
     })
-  }, [monaco, schema, language])
+
+    monaco.editor.defineTheme('transparent-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [],
+      colors: {
+        'editor.background': '#00000000',
+        'editor.lineHighlightBackground': '#00000000',
+        'editorLineNumber.foreground': '#999999',
+        'editorLineNumber.activeForeground': '#000000',
+        focusBorder: '#00000000',
+        'widget.border': '#00000000',
+        'editor.border': '#00000000',
+        'editorWidget.border': '#00000000',
+      },
+    })
+
+    monaco.editor.defineTheme('transparent-dark', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [],
+      colors: {
+        'editor.background': '#00000000',
+        'editor.lineHighlightBackground': '#00000000',
+        'editorLineNumber.foreground': '#666666',
+        'editorLineNumber.activeForeground': '#ffffff',
+        focusBorder: '#00000000',
+        'widget.border': '#00000000',
+        'editor.border': '#00000000',
+        'editorWidget.border': '#00000000',
+      },
+    })
+
+    monaco?.editor.setTheme(editorTheme)
+  }, [monaco, schema, editorTheme])
 
   return (
     <Editor
       data-testid="json-editor"
-      height={height}
       language={language}
       value={value}
       theme={editorTheme}
