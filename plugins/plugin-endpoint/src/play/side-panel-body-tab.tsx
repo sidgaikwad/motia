@@ -1,5 +1,6 @@
+import { cn } from '@motiadev/ui'
 import { CircleX } from 'lucide-react'
-import { FC, memo, useCallback, useEffect, useRef } from 'react'
+import { FC, memo, useCallback, useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { JsonEditor } from '../components/json-editor'
 import { getBodyIsValidSelector, getBodySelector, useEndpointConfiguration } from '../hooks/use-endpoint-configuration'
@@ -13,7 +14,6 @@ export const SidePanelBodyTab: FC<SidePanelBodyTabProps> = memo(({ schema }) => 
   const { setBody, setBodyIsValid } = useEndpointConfiguration()
   const bodyIsValid = useEndpointConfiguration(useShallow(getBodyIsValidSelector))
   const body = useEndpointConfiguration(getBodySelector)
-  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (schema) {
@@ -30,11 +30,11 @@ export const SidePanelBodyTab: FC<SidePanelBodyTabProps> = memo(({ schema }) => 
   )
 
   return (
-    <div className="h-full relative" ref={containerRef}>
+    <div className={cn('grid grid-rows-[1fr_auto] h-full', bodyIsValid && 'grid-rows-[1fr]')}>
       <JsonEditor value={body} schema={schema} onChange={handleBodyChange} onValidate={setBodyIsValid} />
       {!bodyIsValid && (
         <div
-          className="sticky bottom-0 border-t border-border p-3 text-sm dark:text-yellow-500 text-yellow-700 flex items-center gap-1 font-medium"
+          className="border-t border-border p-3 text-sm dark:text-yellow-500 text-yellow-700 flex items-center gap-1 font-medium"
           data-testid="endpoint-body-tab-invalid"
         >
           <CircleX className="w-4 h-4" />
