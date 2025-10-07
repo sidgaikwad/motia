@@ -98,24 +98,6 @@
     }
   },
   {
-    "id": "test-state",
-    "config": {
-      "steps/testState/testStateCheck.step.ts": {
-        "x": 506,
-        "y": 194
-      },
-      "steps/testState/testState.api.step.ts": {
-        "x": -65,
-        "y": 127,
-        "sourceHandlePosition": "right"
-      },
-      "steps/testState/test_state_step.py": {
-        "x": 235,
-        "y": 60
-      }
-    }
-  },
-  {
     "id": "basic-tutorial",
     "config": {
       "steps/basic-tutorial/state-audit-cron.step.ts": {
@@ -171,6 +153,23 @@
       "steps/parallelMergeState/stepB_step.py": {
         "x": 104,
         "y": 201
+      }
+    }
+  },
+  {
+    "id": "test-state",
+    "config": {
+      "steps\\testState\\testStateCheck.step.ts": {
+        "x": 489,
+        "y": 34
+      },
+      "steps\\testState\\testState.api.step.ts": {
+        "x": 0,
+        "y": 0
+      },
+      "steps\\testState\\test_state_step.py": {
+        "x": 234,
+        "y": 60
       }
     }
   }
