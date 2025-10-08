@@ -132,7 +132,7 @@ The app runs locally at **[http://localhost:3000](http://localhost:3000)**.
 - Write unit tests for new features and components.
 - Keep commits focused and descriptive.
 
-📘 **For detailed contribution guidelines, setup steps, and best practices, see the [CONTRIBUTING.md](../../c:/Users/gaikw/AppData/Local/Temp/2f5b0f8f-96b9-491d-9f6d-b4206d4784fc_motia-docs.zip.4fc/CONTRIBUTING.md) file.**
+📘 **For detailed contribution guidelines, setup steps, and best practices, see the [CONTRIBUTING.md](https://github.com/MotiaDev/motia/blob/main/CONTRIBUTING.md) file.**
 
 ## Roadmap
 

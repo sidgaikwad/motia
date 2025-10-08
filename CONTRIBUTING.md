@@ -46,9 +46,9 @@ Before contributing, you’ll need to set up the project locally.
    - Update the `.env` file with your credentials and API keys.
 
 5. Start the development environment:
-
+   - Run this command at the root of the project 
    ```bash
-   pnpm run dev
+   pnpm dev:workbench
    ```
 
    This will start:
