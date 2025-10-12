@@ -94,7 +94,7 @@ This command starts the following services:
 - **MotiaServer**: Provides HTTP endpoints for triggering flows.
 - **Playground UI**: A React-based visualization tool for flows.
 
-The app runs locally at **[http://localhost:3000](http://localhost:3000)**.
+The workbench runs locally at **[http://localhost:3000](http://localhost:3000)**.
 
 ## How to Contribute
 
