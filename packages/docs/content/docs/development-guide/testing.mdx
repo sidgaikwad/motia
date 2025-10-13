@@ -7,68 +7,167 @@ description: Learn how to write and run tests for your Motia components
 
 Testing is an essential part of building reliable and maintainable Motia applications. Motia provides built-in support for writing and running tests to ensure the correctness of your steps, flows, and event handling logic.
 
+## Installation
+
+To add the Motia testing library to your project:
+
+```bash
+pnpm add @motiadev/test --save-dev
+```
+
+> **Note:** This library includes all helpers like `createMotiaTester`, `MockFlowContext`, and logging utilities, so no other setup is needed.
+
 ## Writing Tests for Motia Components
 
 Motia uses [Jest](https://jestjs.io/) as its testing framework. You can write tests for your Motia components using Jest's syntax and assertions.
 
-### Step Tests
+Motia’s testing library provides several utilities for testing endpoints, steps, flows, and logging. Here are some example patterns.
 
-To test a step, create a test file with the same name as the step file, but with a `.test.ts` or `.test.js` extension. For example, if your step file is named `my-step.step.ts`, create a test file named `my-step.step.test.ts`.
+---
 
-Here's an example of a step test:
+### Example 1: Endpoint / Basic Tutorial Test
 
 ```typescript
-// my-step.step.test.ts
-import { createTestContext } from '@motiadev/testing'
-import { handler } from './my-step.step'
+import { createMotiaTester } from "@motiadev/test";
 
-describe('MyStep', () => {
-  it('should emit an event with the correct data', async () => {
-    const { emit, done } = createTestContext()
+describe("POST /basic-tutorial", () => {
+  let tester: ReturnType<typeof createMotiaTester>;
 
-    await handler({ name: 'John' }, { emit })
+  beforeAll(() => {
+    tester = createMotiaTester(); // create once per suite
+  });
 
-    expect(emit).toHaveBeenCalledWith({
-      type: 'my-event',
-      data: { greeting: 'Hello, John!' },
-    })
+  afterAll(async () => {
+    await tester.close(); // proper teardown
+  });
 
-    done()
-  })
-})
+  it("should return 200 OK", async () => {
+    const body = {
+      pet: { name: "Jack", photoUrl: "https://images.dog.ceo/breeds/pug/n02110958_13560.jpg" },
+      foodOrder: { id: "food-order-1", quantity: 0 },
+    };
+
+    const res = await tester.post("/basic-tutorial", { body } as any);
+
+    expect(res.status).toBe(200);
+    expect(res.body.name).toBe("Jack");
+  });
+});
 ```
 
-In this example, we use the `createTestContext` function from `@motiadev/testing` to create a test context with mocked `emit` and `done` functions. We then call the step's `handler` function with test input and the mocked context. Finally, we assert that the `emit` function was called with the expected event type and data.
+**Explanation:**
 
-### Flow Tests
+* Simulates a POST request to `/basic-tutorial`.
+* Uses `createMotiaTester` to create a test environment.
+* Asserts that the response status is 200 and the returned pet name is correct.
+* Useful for **integration testing endpoints**.
+
+**Types / Functions:**
+
+* `createMotiaTester()` → Returns a `MotiaTester` instance.
+* `MotiaTester.post(path, options)` → Simulates a POST request.
+* `MotiaTester.get(path, options)` → Simulates a GET request.
+* `MotiaTester.emit(event)` → Emits an event.
+* `MotiaTester.watch(event)` → Waits for a specific event.
+* `MotiaTester.close()` → Cleans up tester resources.
+
+---
+
+### Flow & Step Tests
 
 To test a flow, create a test file with the flow name and a `.test.ts` or `.test.js` extension. For example, if your flow is named `my-flow`, create a test file named `my-flow.test.ts`.
 
 Here's an example of a flow test:
 
+### Example 2: Step Test with Mocked Services
+
 ```typescript
-// my-flow.test.ts
-import { createTestFlow } from '@motiadev/testing'
-import { handler as stepAHandler } from './step-a.step'
-import { handler as stepBHandler } from './step-b.step'
+import { handler as apiTriggerHandler } from "../../steps/petstore/api.step";
+import { petStoreService } from "../../src/services/pet-store";
+import type { MockFlowContext } from "@motiadev/test";
+import { jest } from "@jest/globals";
 
-describe('MyFlow', () => {
-  it('should execute steps in the correct order', async () => {
-    const flow = createTestFlow('my-flow')
-      .step('step-a', stepAHandler)
-      .step('step-b', stepBHandler)
+jest.mock("../../src/services/pet-store", () => ({
+  petStoreService: { createPet: jest.fn() },
+  petSchema: {},
+}));
 
-    const result = await flow.execute({ name: 'Alice' })
+describe("ApiTrigger Step", () => {
+  let mockContext: MockFlowContext;
 
-    expect(result).toEqual({
-      greeting: 'Hello, Alice!',
-      message: 'Welcome to Motia!',
-    })
-  })
-})
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockContext = {
+      traceId: "TRACE-123",
+      emit: jest.fn(),
+      state: { set: jest.fn(), get: jest.fn(), delete: jest.fn() } as any,
+      logger: { info: jest.fn(), debug: jest.fn(), warn: jest.fn(), error: jest.fn(), log: jest.fn() } as any,
+      streams: {},
+    } as unknown as MockFlowContext;
+  });
+
+  it("should create a pet and emit a process-food-order event if foodOrder is provided", async () => {
+    const mockPet = { id: 123, name: "Jack", photoUrl: "...", status: "available" };
+    mockedPetStoreService.createPet.mockResolvedValue(mockPet);
+
+    const req = { body: { pet: { name: "Jack", photoUrl: "..." }, foodOrder: { id: "order-1", quantity: 2 } } };
+
+    const result = await apiTriggerHandler(req as any, mockContext as any);
+
+    expect(petStoreService.createPet).toHaveBeenCalledWith(req.body.pet);
+    expect(mockContext.emit).toHaveBeenCalledWith(expect.objectContaining({ topic: "process-food-order" }));
+    expect(result.status).toBe(200);
+  });
+});
 ```
 
-In this example, we use the `createTestFlow` function from `@motiadev/testing` to create a test flow with the specified steps. We then execute the flow with test input and assert that the final result matches the expected output.
+**Explanation:**
+
+* Tests a single step in isolation.
+* Mocks `petStoreService` to avoid real DB/service calls.
+* Provides `MockFlowContext` to simulate emit, logger, state, and traceId.
+* Asserts the correct step behavior and emitted events.
+* Useful for **unit testing steps**.
+
+**Types / Functions:**
+
+* `MockFlowContext` → Simulates a step’s execution context.
+* `logger: jest.Mocked<Logger>` → Captures logs.
+* `emit()` → Mock function to verify events.
+* `state` → Mocked internal state manager.
+* `traceId` → Step execution identifier.
+
+
+---
+
+### Example 3: Logger Testing
+
+```typescript
+import { createMockLogger } from '@motiadev/test';
+
+test('logger logs info message', () => {
+  const logger = createMockLogger();
+
+  logger.info('Test message');
+
+  expect(logger.info).toHaveBeenCalledWith('Test message');
+  expect(logger.info).toHaveBeenCalledTimes(1);
+});
+```
+
+**Explanation:**
+
+* Tests logging behavior in isolation.
+* Uses `createMockLogger` to mock all logging methods.
+* Asserts that `.info()` is called correctly.
+* Useful for validating logs in steps or flows.
+
+**Types / Functions:**
+
+* `createMockLogger(): jest.Mocked<Logger>` → Returns a fully mocked logger.
+* `Logger` → Motia’s logging utility with methods like `.info()`, `.debug()`, etc.
+
+---
 
 ## Running Tests Locally
 
