@@ -67,14 +67,20 @@ Motia.js strives to be:
    pnpm install
    ```
 
-3. Set up Motia in the playground:
+3. Build the project:
+
+   ```bash
+   pnpm build
+   ```
+
+4. Set up Motia in the playground:
 
    ```bash
    cd playground
    npx motia install
    ```
 
-4. Set up environment variables:
+5. Set up environment variables:
    - Copy the example `.env` file:
      ```bash
      cp playground/.env.example playground/.env

@@ -31,15 +31,21 @@ Before contributing, you’ll need to set up the project locally.
    ```bash
    pnpm install
    ```
+   
+3. Build the project:
 
-3. Set up Motia in the playground:
+   ```bash
+   pnpm build
+   ```
+
+4. Set up Motia in the playground:
 
    ```bash
    cd playground
    npx motia install
    ```
 
-4. Set up environment variables:
+5. Set up environment variables:
 
    - Copy the example `.env` file:
      ```bash
@@ -47,7 +53,7 @@ Before contributing, you’ll need to set up the project locally.
      ```
    - Update the `.env` file with your credentials and API keys.
 
-5. Start the development environment:
+6. Start the development environment:
 
    - pnpn run dev
 
