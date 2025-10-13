@@ -23,6 +23,27 @@ program
   })
 
 program
+  .command('test')
+  .description('Run all tests in your local project')
+  .option('-w, --watch', 'Run tests in watch mode')
+  .action(async (options) => {
+    // CommonJS style
+    const execa = require('execa') // no destructuring
+
+    const projectRoot = process.cwd()
+
+    try {
+      await execa('npx', options.watch ? ['jest', '--watch'] : ['jest'], {
+        stdio: 'inherit',
+        cwd: projectRoot,
+      })
+    } catch (err: any) {
+      console.error('Error running tests:', err.message || err)
+      process.exit(1)
+    }
+  })
+
+program
   .command('create')
   .description('Create a new motia project')
   .option(
