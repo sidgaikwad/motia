@@ -106,6 +106,7 @@ program
   .option('-v, --disable-verbose', 'Disable verbose logging')
   .option('-d, --debug', 'Enable debug logging')
   .option('-m, --mermaid', 'Enable mermaid diagram generation')
+  .option('--motia-dir <path>', 'Path where .motia folder will be created')
   .action(async (arg) => {
     if (arg.debug) {
       console.log('🔍 Debug logging enabled')
@@ -115,7 +116,7 @@ program
     const port = arg.port ? parseInt(arg.port) : defaultPort
     const host = arg.host ? arg.host : defaultHost
     const { dev } = require('./dev')
-    await dev(port, host, arg.disableVerbose, arg.mermaid)
+    await dev(port, host, arg.disableVerbose, arg.mermaid, arg.motiaDir)
   })
 
 program
@@ -125,6 +126,7 @@ program
   .option('-H, --host [host]', 'The host address for the server', `${defaultHost}`)
   .option('-v, --disable-verbose', 'Disable verbose logging')
   .option('-d, --debug', 'Enable debug logging')
+  .option('--motia-dir <path>', 'Path where .motia folder will be created')
   .action(async (arg) => {
     if (arg.debug) {
       console.log('🔍 Debug logging enabled')
@@ -134,7 +136,7 @@ program
     const port = arg.port ? parseInt(arg.port) : defaultPort
     const host = arg.host ? arg.host : defaultHost
     const { start } = require('./start')
-    await start(port, host, arg.disableVerbose)
+    await start(port, host, arg.disableVerbose, arg.motiaDir)
   })
 
 program
@@ -192,7 +194,7 @@ generate
     const { generateLockedData } = require('./generate-locked-data')
     const { generateOpenApi } = require('./openapi/generate')
 
-    const lockedData = await generateLockedData(process.cwd())
+    const lockedData = await generateLockedData({ projectDir: process.cwd() })
     const apiSteps = lockedData.apiSteps()
 
     generateOpenApi(process.cwd(), apiSteps, options.title, options.version, options.output)
