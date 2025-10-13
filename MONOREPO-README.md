@@ -61,19 +61,13 @@ Motia.js strives to be:
    cd motia-monorepo
    ```
 
-2. Install Motia CLI globally:
-
-   ```bash
-   npm install -g motia
-   ```
-
-3. Install dependencies:
+2. Install dependencies:
 
    ```bash
    pnpm install
    ```
    
-4. Set up environment variables:
+3. Set up environment variables:
    - Copy the example `.env` file:
      ```bash
      cp playground/.env.example playground/.env
