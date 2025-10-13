@@ -32,22 +32,33 @@ Before contributing, you’ll need to set up the project locally.
    pnpm install
    ```
 
-3. Set up environment variables:
+3. Set up Motia in the playground:
+
+   ```bash
+   cd playground
+   npx motia install
+   ```
+
+4. Set up environment variables:
+
    - Copy the example `.env` file:
      ```bash
      cp playground/.env.example playground/.env
      ```
    - Update the `.env` file with your credentials and API keys.
 
-4. Start the development environment:
+5. Start the development environment:
+
    - pnpn run dev
 
    - Run this command at the root of the project to start workbench
+
    ```bash
    pnpm dev:workbench
    ```
 
    This will start:
+
    - **MotiaCore** (flow orchestrator)
    - **MotiaServer** (HTTP endpoints)
    - **Playground UI** (flow visualization)
