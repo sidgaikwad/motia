@@ -1,10 +1,12 @@
 import { MotiaStreamProvider } from '@motiadev/stream-client-react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { RootMotia } from './components/root-motia'
+import { App } from './App'
+import { NotFoundPage } from './components/NotFoundPage'
 import '@motiadev/ui/globals.css'
 import './index.css'
-import { App } from './App'
 
 const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
@@ -15,7 +17,12 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <MotiaStreamProvider address={address}>
         <RootMotia>
-          <App />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<App />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </BrowserRouter>
         </RootMotia>
       </MotiaStreamProvider>
     </StrictMode>,
