@@ -1,51 +1,65 @@
 {
-  "name": "motia-monorepo",
-  "private": true,
-  "scripts": {
-    "dev:docs": "pnpm -r --filter=docs start",
-    "dev": "pnpm run build && pnpm -r --filter=playground dev",
-    "dev:workbench": "pnpm run build && pnpm -r --filter=playground dev:workbench",
-    "build": "pnpm --filter=!docs run -r build",
-    "lint": "pnpm run -r --no-bail lint",
-    "lint:fix": "pnpm run -r --no-bail lint --fix",
-    "test": "pnpm -r run test",
-    "test:e2e": "pnpm --filter=@motiadev/e2e test",
-    "test:e2e:ui": "pnpm --filter=@motiadev/e2e test:ui",
-    "test:e2e:headed": "pnpm --filter=@motiadev/e2e test:headed",
-    "e2e:install": "pnpm --filter=@motiadev/e2e install && pnpm --filter=@motiadev/e2e install:deps",
-    "clean": "rm -rf node_modules pnpm-lock.yaml dist .turbo .next"
-  },
-  "devDependencies": {
-    "@types/node": "^22.15.18",
-    "@typescript-eslint/eslint-plugin": "^8.32.1",
-    "@typescript-eslint/parser": "^8.32.1",
-    "eslint": "^9.26.0",
-    "@eslint/js": "^9.28.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-jest": "^28.11.0",
-    "eslint-plugin-prettier": "^5.4.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.1.0",
-    "prettier": "^3.5.3"
-  },
-  "resolutions": {
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.17.0",
-    "postcss": "^8.5.3",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "typescript": "^5.7.3",
-    "@types/node": "^22.15.18",
-    "@types/react": "^19.1.4",
-    "@types/react-dom": "^19.1.5"
-  },
-  "packageManager": "pnpm@10.11.0",
-  "volta": {
-    "node": "20.11.1"
-  },
-  "dependencies": {
-    "axios": "^1.9.0"
-  },
-  "version": "0.0.7"
+	"name": "motia-monorepo",
+	"private": true,
+	"scripts": {
+		"dev:docs": "pnpm -r --filter=docs start",
+		"dev": "pnpm run build && pnpm -r --filter=playground dev",
+		"dev:workbench": "pnpm run build && pnpm -r --filter=playground dev:workbench",
+		"build": "pnpm --filter=!docs run -r build",
+		"lint": "pnpm run -r --no-bail lint",
+		"lint:fix": "pnpm run -r --no-bail lint --fix",
+		"biome:check": "biome check .",
+		"biome:fix": "biome check --apply .",
+		"biome:format": "biome format .",
+		"biome:format:fix": "biome format --write .",
+		"test": "pnpm -r run test",
+		"test:e2e": "pnpm --filter=@motiadev/e2e test",
+		"test:e2e:ui": "pnpm --filter=@motiadev/e2e test:ui",
+		"test:e2e:headed": "pnpm --filter=@motiadev/e2e test:headed",
+		"e2e:install": "pnpm --filter=@motiadev/e2e install && pnpm --filter=@motiadev/e2e install:deps",
+		"clean": "rm -rf node_modules pnpm-lock.yaml dist .turbo .next",
+		"prepare": "husky"
+	},
+	"lint-staged": {
+		"*.{js,ts,tsx,json,css,md}": [
+			"biome format --write",
+			"biome check"
+		]
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.6",
+		"@eslint/js": "^9.28.0",
+		"@types/node": "^22.15.18",
+		"@typescript-eslint/eslint-plugin": "^8.32.1",
+		"@typescript-eslint/parser": "^8.32.1",
+		"eslint": "^9.26.0",
+		"eslint-config-prettier": "^10.1.5",
+		"eslint-plugin-jest": "^28.11.0",
+		"eslint-plugin-prettier": "^5.4.0",
+		"eslint-plugin-react-hooks": "^5.2.0",
+		"eslint-plugin-react-refresh": "^0.4.20",
+		"globals": "^16.1.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.2.4",
+		"prettier": "^3.5.3"
+	},
+	"resolutions": {
+		"autoprefixer": "^10.4.20",
+		"eslint": "^9.17.0",
+		"postcss": "^8.5.3",
+		"react": "^19.1.1",
+		"react-dom": "^19.1.1",
+		"typescript": "^5.7.3",
+		"@types/node": "^22.15.18",
+		"@types/react": "^19.1.4",
+		"@types/react-dom": "^19.1.5"
+	},
+	"packageManager": "pnpm@10.11.0",
+	"volta": {
+		"node": "20.11.1"
+	},
+	"dependencies": {
+		"axios": "^1.9.0"
+	},
+	"version": "0.0.7"
 }

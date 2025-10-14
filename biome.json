@@ -1,0 +1,53 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": true,
+		"lineWidth": 100
+	},
+
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true
+		}
+	},
+
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"semicolons": "asNeeded"
+		}
+	},
+
+	"files": {
+		"includes": [
+			"**",
+			"!**/node_modules",
+			"!**/dist",
+			"!**/build",
+			"!**/*.py",
+			"!**/*.pyc",
+			"!**/*.rb",
+			"!**/venv/**",
+			"!**/__pycache__/**",
+			"!**/Gemfile*",
+			"!**/vendor/**"
+		]
+	},
+
+	"overrides": [
+		{
+			"includes": [
+				"**/packages/**/*.{js,ts,jsx,tsx,json,md}",
+				"**/playground/**/*.{js,ts,jsx,tsx,json,md}"
+			],
+			"formatter": {
+				"enabled": true
+			}
+		}
+	]
+}
