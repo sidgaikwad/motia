@@ -40,7 +40,7 @@ export const setupJest = async (packageManager: string, rootDir: string, context
     }
 
     // Optional: Ensure type module for ESM Jest compatibility
-   if (pkg.type === 'module') delete pkg.type;
+    if (pkg.type === 'module') delete pkg.type
 
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2))
 

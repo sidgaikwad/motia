@@ -20,8 +20,8 @@ export interface MotiaTester {
 
 export type RequestOptions = {
   body?: Record<string, unknown>
-  headers?: Record<string, string>;
-  cookies?: Record<string, string>;
+  headers?: Record<string, string>
+  cookies?: Record<string, string>
 }
 
 export type CapturedEvent<TData = unknown> = Omit<Event<TData>, 'logger' | 'tracer'>

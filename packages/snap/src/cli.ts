@@ -37,8 +37,12 @@ program
         stdio: 'inherit',
         cwd: projectRoot,
       })
-    } catch (err: any) {
-      console.error('Error running tests:', err.message || err)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error running tests:', err.message)
+      } else {
+        console.error('Unknown error:', err)
+      }
       process.exit(1)
     }
   })
