@@ -20,6 +20,7 @@ import { Motia } from './motia'
 import { createTracerFactory } from './observability/tracer'
 import { Printer } from './printer'
 import { createSocketServer } from './socket-server'
+import { createSseServer } from './sse-server'
 import { StateAdapter } from './state/state-adapter'
 import { createStepHandlers, MotiaEventManager } from './step-handlers'
 import { systemSteps } from './steps'
@@ -78,15 +79,31 @@ export const createServer = (
     },
   })
 
+  const { pushSseEvent } = createSseServer(app)
+
+  const pushEventWithSse = <TData>(message: any) => {
+    pushEvent(message) // send to WebSocket clients
+    pushSseEvent(message) // also send to SSE clients
+  }
+
+  app.post('/test/sse', (req, res) => {
+    const message = {
+      message: 'Hello from backend 👋',
+      time: new Date().toISOString(),
+      random: Math.floor(Math.random() * 1000),
+    }
+
+    pushSseEvent(message)
+    console.log('[SSE] Sent test event:', message)
+    res.json({ success: true, sent: message })
+  })
+
   lockedData.applyStreamWrapper((streamName, stream) => {
     return (): MotiaStream<BaseStreamItem> => {
       const main = stream() as MotiaStream<BaseStreamItem>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const wrapObject = (groupId: string, id: string, object: any) => {
-        if (!object) {
-          return null
-        }
 
+      const wrapObject = (groupId: string, id: string, object: any) => {
+        if (!object) return null
         return {
           ...object,
           __motia: { type: 'state-stream', streamName, groupId, id },
@@ -99,7 +116,11 @@ export const createServer = (
       const mainDelete = main.delete
 
       main.send = async <T>(channel: StateStreamEventChannel, event: StateStreamEvent<T>) => {
-        pushEvent({ streamName, ...channel, event: { type: 'event', event } })
+        pushEventWithSse({
+          streamName,
+          ...channel,
+          event: { type: 'event', event },
+        })
       }
 
       main.getGroup = async (groupId: string) => {
@@ -113,9 +134,7 @@ export const createServer = (
       }
 
       main.set = async (groupId: string, id: string, data: BaseStreamItem) => {
-        if (!data) {
-          return null
-        }
+        if (!data) return null
 
         const exists = await main.get(groupId, id)
         const updated = await mainSet.apply(main, [groupId, id, data])
@@ -123,7 +142,7 @@ export const createServer = (
         const wrappedResult = wrapObject(groupId, id, result)
 
         const type = exists ? 'update' : 'create'
-        pushEvent({ streamName, groupId, id, event: { type, data: result } })
+        pushEventWithSse({ streamName, groupId, id, event: { type, data: result } })
 
         return wrappedResult
       }
@@ -131,7 +150,12 @@ export const createServer = (
       main.delete = async (groupId: string, id: string) => {
         const result = await mainDelete.apply(main, [groupId, id])
 
-        pushEvent({ streamName, groupId, id, event: { type: 'delete', data: result } })
+        pushEventWithSse({
+          streamName,
+          groupId,
+          id,
+          event: { type: 'delete', data: result },
+        })
 
         return wrapObject(groupId, id, result)
       }
